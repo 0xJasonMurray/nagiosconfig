@@ -2,12 +2,13 @@
 
 import argparse
 import re
+import sys
 
 
 availableDeviceTypes = ['server', 'router', 'switch', 'unknown']
 availableServiceChecks= ['ping', 'ssh']
 
-hostGroupFile = './wu-hostgroups.cfg'
+hostGroupFile = 'hostgroups.cfg'
 
 
 
@@ -16,11 +17,12 @@ def getArguments():
     parser = argparse.ArgumentParser(description='Script to automatically build Nagios host and service definations')
     parser.add_argument('--hostname', action='store', dest='hostname', required=True, help='The fully qualified hostname')
     parser.add_argument('--createhost', action='store_true', dest='createhost', help='Create host defination')
-    parser.add_argument('--service', action='append', dest='service', help='Create service defination')
+    parser.add_argument('--service', action='append', dest='service', choices=availableServiceChecks, help='Create service defination')
     parser.add_argument('--ipaddr', action='store', dest='ipaddr', required=True, help='Public IP address of the device')
     parser.add_argument('--parents', action='append', dest='parents', help='FQDN of the object parents, this host must already exist.  Multiple --parents can be used')
-    parser.add_argument('--hostgroups', action='append', dest='hostgroups', help='Hostgroups the device should be a part of.  Multiple --hostgroups can be used')
-    parser.add_argument('--devicetype', action='store', dest='devicetype', default='unknown', help='Type of device')
+    #parser.add_argument('--hostgroups', action='append', dest='hostgroups', help='Hostgroups the device should be a part of.  Multiple --hostgroups can be used')
+    parser.add_argument('--hostgroups', action='append', dest='hostgroups', choices=getHostGroups(hostGroupFile), help='Hostgroups the device should be a part of.  Multiple --hostgroups can be used')
+    parser.add_argument('--devicetype', action='store', dest='devicetype', default='unknown', choices=availableDeviceTypes, help='Type of device')
     parser.add_argument('--version', action='version', version='%(prog)s 0.1beta')
 
     args = parser.parse_args()
@@ -32,33 +34,8 @@ def getArguments():
 ## Validate options to arguments are valid.
 ##
 def validateArgs(args):
-    # Validate device types
-    if args.devicetype not in availableDeviceTypes:
-        print "\nError: "
-        print "  --devicetype selection is invalid, please select from the following: "
-        for i in availableDeviceTypes:
-            print "\t", i
-        exit(-1)
 
-    # Validate Service Checks
-    if args.service:
-        for s in args.service:
-            if s not in availableServiceChecks:
-                print "\nError: "
-                print "  --service selection is invalid, please select from the following: "
-                for i in availableServiceChecks:
-                    print "\t", i
-                exit(-1)
-
-    # Validate host groups
-    availableHostGroups = getHostGroups(hostGroupFile)
-    if args.hostgroups:
-        for hg in args.hostgroups:	
-            if hg not in availableHostGroups:	
-                print "\nError: "	
-                print "  --hostgroup selection is invalid, please select from the following: "	
-                for ahg in availableHostGroups:	
-                    print "\t", ahg	
+    # Do nothing anymore, found the "choices" option to argparse...
 
     # Print all arguments while debugging
     print "DEBUG all arguments: ", args
@@ -145,7 +122,7 @@ def getHostGroups(hostGroupFile):
         if result:
             availableHostGroups.append(result.group(1))
 
-    print "DEBUG availableHostGroups: ", availableHostGroups
+    #print "DEBUG availableHostGroups: ", availableHostGroups
     hgf.close()
     return availableHostGroups
 

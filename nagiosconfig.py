@@ -2,18 +2,21 @@
 
 import argparse
 import re
-import sys
+import glob
 
 
+##
+## Global Configuration
+##
 availableDeviceTypes = ['server', 'router', 'switch', 'unknown']
-availableServiceChecks= ['ping', 'ssh']
-
-hostGroupFile = 'hostgroups.cfg'
-
-
+hostTemplates = 'templates/host'
+serviceTemplates = 'templates/service'
+hostGroupFile = './hostgroups.cfg'
 
 
-def getArguments():
+
+
+def getArguments(hostGroupFile, availableServiceChecks):
     parser = argparse.ArgumentParser(description='Script to automatically build Nagios host and service definations')
     parser.add_argument('--hostname', action='store', dest='hostname', required=True, help='The fully qualified hostname')
     parser.add_argument('--createhost', action='store_true', dest='createhost', help='Create host defination')
@@ -126,10 +129,29 @@ def getHostGroups(hostGroupFile):
     hgf.close()
     return availableHostGroups
 
+##
+## Get template files
+##
+def getServiceTemplates(serviceTemplates):
+    availableServiceChecks = []
+    serviceCheckFiles = {}
+    for file in glob.glob(serviceTemplates+'/*.t'):
+        fh = open(file, 'r')
+        for line in fh:
+            m = re.search('^#type:\s+(\w+)$', line)
+            if m:
+                print "DEBUG template type: {0}".format(m.group(1))
+                availableServiceChecks.append(m.group(1))
+                serviceCheckFiles = { m.group(1), file }
+
+    print "DEBUG: ", serviceCheckFiles
+    return availableServiceChecks, serviceCheckFiles
+
 
 
 def main():
-    args = getArguments()
+    availableServiceChecks, serviceCheckFiles = getServiceTemplates(serviceTemplates)
+    args = getArguments(hostGroupFile, availableServiceChecks)
     validateArgs(args)
     if args.createhost:
         buildHost(args)

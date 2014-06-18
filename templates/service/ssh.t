@@ -1,8 +1,8 @@
 #type: ssh
 
-service_description             test1.example.com-ssh
+service_description             %%service_description%%
+host_name                       %%host_name%%
 check_command                   check_ssh
-host_name                       test1.example.com
 notification_interval           0
 active_checks_enabled           1
 passive_checks_enabled          1

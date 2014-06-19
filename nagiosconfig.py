@@ -76,57 +76,52 @@ def buildHost(args):
     print "}"
     print ""
 
+def buildService(service, serviceCheckFiles, args):
+    try:
+        print "DEBUG: Building Service {0} from file: {1}".format(service, serviceCheckFiles[service])
+        fh = open(serviceCheckFiles[service], 'r')
+        print "service {"
+        for line in fh:
+            m = re.search('^#type:', line)
+            if m:
+                continue
 
-def buildService(args):
-    for service in args.service:
-        print "define service {"
-        if service == "ping":
-            print "\tservice_description             %s-ping" % args.hostname
-            print "\tcheck_command                   check_ping!1000.0,20%!2000.0,60%"
-        elif service == "ssh":
-            print "\tservice_description             %s-ssh" % args.hostname
-            print "\tcheck_command                   check_ssh"
-        print "\thost_name                       %s" % args.hostname
-        print "\tnotification_interval           0"
-        print "\tactive_checks_enabled           1"
-        print "\tpassive_checks_enabled          1"
-        print "\tparallelize_check               1"
-        print "\tobsess_over_service             1"
-        print "\tcheck_freshness                 0"
-        print "\tnotifications_enabled           1"
-        print "\tevent_handler_enabled           1"
-        print "\tflap_detection_enabled          1"
-        print "\tfailure_prediction_enabled      1"
-        print "\tprocess_perf_data               1"
-        print "\tretain_status_information       1"
-        print "\tretain_nonstatus_information    1"
-        print "\tis_volatile                     0"
-        print "\tcheck_period                    24x7"
-        print "\tnormal_check_interval           5"
-        print "\tretry_check_interval            1"
-        print "\tmax_check_attempts              4"
-        print "\tnotification_period             24x7"
-        print "\tnotification_options            w,u,c,r"
-        print "\tcontact_groups                  admins"
+            m = re.search('^$', line)
+            if m:
+                continue
+
+            m = re.search('^(.*)\s+(%%service_description%%)', line)
+            if m:
+                print "\t{0} {1}-{2}".format(m.group(1), service.upper(), args.hostname)
+                continue
+
+            m = re.search('^(.*)\s+(%%host_name%%)', line)
+            if m:
+                print "\t{0} {1}".format(m.group(1), args.hostname)
+                continue
+
+            print "\t{0}".format(line),
         print "}"
         print ""
 
+    except:
+        print "This should not happen, but the service '{0}' does not exist, please try again".format(service)
 
 ##
 ## Get hostgroup entries
 ##
 def getHostGroups(hostGroupFile):
     availableHostGroups = []
-    hgf = open(hostGroupFile, 'r')
+    fh = open(hostGroupFile, 'r')
     pattern = '^\s+hostgroup_name\s+(\w+)$'
     recomp = re.compile(pattern)
-    for line in hgf:
+    for line in fh:
         result = recomp.match(line)
         if result:
             availableHostGroups.append(result.group(1))
 
     #print "DEBUG availableHostGroups: ", availableHostGroups
-    hgf.close()
+    fh.close()
     return availableHostGroups
 
 ##
@@ -142,8 +137,9 @@ def getServiceTemplates(serviceTemplates):
             if m:
                 print "DEBUG template type: {0}".format(m.group(1))
                 availableServiceChecks.append(m.group(1))
-                serviceCheckFiles = { m.group(1), file }
+                serviceCheckFiles[m.group(1)] = file
 
+    fh.close()
     print "DEBUG: ", serviceCheckFiles
     return availableServiceChecks, serviceCheckFiles
 
@@ -156,7 +152,8 @@ def main():
     if args.createhost:
         buildHost(args)
     if args.service:
-        buildService(args)
+        for service in args.service:
+            buildService(service, serviceCheckFiles, args)
 
 
 # main

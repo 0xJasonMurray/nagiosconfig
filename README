@@ -1,0 +1,128 @@
+==================================================
+===> MUCH BETTER DOCUMENTATION IS COMING SOON <===
+==================================================
+
+
+Version 0.1beta of command line script to configure Nagios host and service configuration files.   This is very beta and work in progress. 
+
+
+Service definitions are created based on template files.  The --service option is dynamically built based on the service definition files.
+
+The --hostgroups are dynamically built based on the standard Nagios hostgroup.cfg configuration file.
+
+
+General syntax and options:
+
+$ ./nagiosconfig.py --help
+usage: nagiosconfig.py [-h] --hostname HOSTNAME [--createhost]
+                       [--service {offcampusping,ping,ssh}] --ipaddr IPADDR
+                       [--parents PARENTS]
+                       [--hostgroups {nss,server,dns,unused,router,offcampus,charter}]
+                       [--devicetype {server,router,switch,unknown}]
+                       [--version]
+
+Script to automatically build Nagios host and service definations
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --hostname HOSTNAME   The fully qualified hostname
+  --createhost          Create host defination
+  --service {offcampusping,ping,ssh}
+                        Create service defination
+  --ipaddr IPADDR       Public IP address of the device
+  --parents PARENTS     FQDN of the object parents, this host must already
+                        exist. Multiple --parents can be used
+  --hostgroups {nss,server,dns,unused,router,offcampus,charter}
+                        Hostgroups the device should be a part of. Multiple
+                        --hostgroups can be used
+  --devicetype {server,router,switch,unknown}
+                        Type of device
+  --version             show program's version number and exit
+
+
+
+
+
+
+Example run:
+
+$ ./nagiosconfig.py --hostname test1.example.com --ipaddr 1.2.3.4 --parents switch1.example.com --hostgroup server --hostgroup nss --hostgroup dns --device server --parents switch2.example.com --service ping --service ssh --createhost --device server
+
+
+define host {
+    host_name                          test1.example.com
+    alias                              test1.example.com
+    address                            1.2.3.4
+    parents                            switch1.example.com, switch2.example.com
+    hostgroups                         server, nss, dns
+    notifications_enabled              1
+    event_handler_enabled              1
+    flap_detection_enabled             1
+    failure_prediction_enabled         1
+    process_perf_data                  1
+    retain_status_information          1
+    retain_nonstatus_information       1
+    check_command                      check-host-alive
+    max_check_attempts                 10
+    notification_interval              0
+    notification_period                24x7
+    notification_options               d,u,r
+    contact_groups                     admins
+    icon_image                         base/linux40.png
+    icon_image_alt                     Debian GNU/Linux
+}
+
+service {
+    service_description             PING-test1.example.com
+    host_name                       test1.example.com
+    check_command                   check_ping
+    notification_interval           0
+    active_checks_enabled           1
+    passive_checks_enabled          1
+    parallelize_check               1
+    obsess_over_service             1
+    check_freshness                 0
+    notifications_enabled           1
+    event_handler_enabled           1
+    flap_detection_enabled          1
+    failure_prediction_enabled      1
+    process_perf_data               1
+    retain_status_information       1
+    retain_nonstatus_information    1
+    is_volatile                     0
+    check_period                    24x7
+    normal_check_interval           5
+    retry_check_interval            1
+    max_check_attempts              4
+    notification_period             24x7
+    notification_options            w,u,c,r
+    contact_groups                  admins
+}
+
+service {
+    service_description             SSH-test1.example.com
+    host_name                       test1.example.com
+    check_command                   check_ssh
+    notification_interval           0
+    active_checks_enabled           1
+    passive_checks_enabled          1
+    parallelize_check               1
+    obsess_over_service             1
+    check_freshness                 0
+    notifications_enabled           1
+    event_handler_enabled           1
+    flap_detection_enabled          1
+    failure_prediction_enabled      1
+    process_perf_data               1
+    retain_status_information       1
+    retain_nonstatus_information    1
+    is_volatile                     0
+    check_period                    24x7
+    normal_check_interval           5
+    retry_check_interval            1
+    max_check_attempts              4
+    notification_period             24x7
+    notification_options            w,u,c,r
+    contact_groups                  admins
+
+

@@ -46,7 +46,10 @@ optional arguments:
 
 Example run:
 
-$ ./nagiosconfig.py --hostname test1.example.com --ipaddr 1.2.3.4 --parents switch1.example.com --hostgroup server --hostgroup nss --hostgroup dns --device server --parents switch2.example.com --service ping --service ssh --createhost --device server
+$ ./nagiosconfig.py --hostname test1.example.com --ipaddr 1.2.3.4 \
+   --parents switch1.example.com --hostgroup server --hostgroup nss \
+   --hostgroup dns --device server --parents switch2.example.com \
+   --service ping --service ssh --createhost
 
 
 define host {

@@ -44,6 +44,7 @@ def validateArgs(args):
             for i in args.regexChange:
                 reg, value = i.split(':')
                 print "DEBUG regex values: {0} {1}".format(reg, value)
+    # Use an exception to catch the fact that two values are needed within the split.
     except:
         print '\nError:'
         print '\t--regexchange must have two values in the following format "regular_expression:change_value"'
@@ -87,7 +88,7 @@ def buildHost(args):
     print ""
 
 def buildService(service, serviceCheckFiles, args):
-#    try:
+    try:
         print "DEBUG: Building Service {0} from file: {1}".format(service, serviceCheckFiles[service])
         fh = open(serviceCheckFiles[service], 'r')
         print "service {"
@@ -117,7 +118,7 @@ def buildService(service, serviceCheckFiles, args):
                     pattern = "("+reg+")\s+(.*)"
                     m = re.search(pattern, line)
                     if m:
-                        print "\t{0}{1:>25}".format(m.group(1), rvalue)
+                        print "\t{0:<32}{1:<25}".format(m.group(1), rvalue)
                         found = True
                 if found:
                      continue
@@ -125,8 +126,8 @@ def buildService(service, serviceCheckFiles, args):
         print "}"
         print ""
 
-#    except:
-#        print "This should not happen, but the service '{0}' does not exist, please try again".format(service)
+    except:
+        print "This should not happen, but the service '{0}' does not exist, please try again".format(service)
 
 ##
 ## Get hostgroup entries

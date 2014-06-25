@@ -26,7 +26,7 @@ def getArguments(hostGroupFile, availableServiceChecks):
     #parser.add_argument('--hostgroups', action='append', dest='hostgroups', help='Hostgroups the device should be a part of.  Multiple --hostgroups can be used')
     parser.add_argument('--hostgroups', action='append', dest='hostgroups', choices=getHostGroups(hostGroupFile), help='Hostgroups the device should be a part of.  Multiple --hostgroups can be used')
     parser.add_argument('--devicetype', action='store', dest='devicetype', default='unknown', choices=availableDeviceTypes, help='Type of device')
-    parser.add_argument('--regexchange', action='append', dest='regexChange', help='Use a regular expression to change anything in service templates')
+    parser.add_argument('--regexchange', action='append', dest='regexChange', metavar='regular_expression:new_value', help='Use a regular expression to change anything in service templates')
     parser.add_argument('--version', action='version', version='%(prog)s 0.1beta')
 
     args = parser.parse_args()
@@ -39,7 +39,16 @@ def getArguments(hostGroupFile, availableServiceChecks):
 ##
 def validateArgs(args):
 
-    # Do nothing anymore, found the "choices" option to argparse...
+    try:
+        if args.regexChange:
+            for i in args.regexChange:
+                reg, value = i.split(':')
+                print "DEBUG regex values: {0} {1}".format(reg, value)
+    except:
+        print '\nError:'
+        print '\t--regexchange must have two values in the following format "regular_expression:change_value"'
+        exit(-1)
+
 
     # Print all arguments while debugging
     print "DEBUG all arguments: ", args
@@ -102,13 +111,16 @@ def buildService(service, serviceCheckFiles, args):
                 continue
 
             if args.regexChange:
-                for reg, rvalue in args.regexChange.split(':'):
-                    print "DEBUG regexChange: {0} {1}".format(reg, rvalue)
+                found = False
+                for i in args.regexChange:
+                    reg, rvalue = i.split(':')
                     pattern = "("+reg+")\s+(.*)"
                     m = re.search(pattern, line)
                     if m:
-                        print "DEBUG regex found"
-
+                        print "\t{0}{1:>25}".format(m.group(1), rvalue)
+                        found = True
+                if found:
+                     continue
             print "\t{0}".format(line),
         print "}"
         print ""

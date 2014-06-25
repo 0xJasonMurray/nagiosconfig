@@ -26,6 +26,7 @@ def getArguments(hostGroupFile, availableServiceChecks):
     #parser.add_argument('--hostgroups', action='append', dest='hostgroups', help='Hostgroups the device should be a part of.  Multiple --hostgroups can be used')
     parser.add_argument('--hostgroups', action='append', dest='hostgroups', choices=getHostGroups(hostGroupFile), help='Hostgroups the device should be a part of.  Multiple --hostgroups can be used')
     parser.add_argument('--devicetype', action='store', dest='devicetype', default='unknown', choices=availableDeviceTypes, help='Type of device')
+    parser.add_argument('--regexchange', action='append', dest='regexChange', help='Use a regular expression to change anything in service templates')
     parser.add_argument('--version', action='version', version='%(prog)s 0.1beta')
 
     args = parser.parse_args()
@@ -77,7 +78,7 @@ def buildHost(args):
     print ""
 
 def buildService(service, serviceCheckFiles, args):
-    try:
+#    try:
         print "DEBUG: Building Service {0} from file: {1}".format(service, serviceCheckFiles[service])
         fh = open(serviceCheckFiles[service], 'r')
         print "service {"
@@ -100,12 +101,20 @@ def buildService(service, serviceCheckFiles, args):
                 print "\t{0} {1}".format(m.group(1), args.hostname)
                 continue
 
+            if args.regexChange:
+                for reg, rvalue in args.regexChange.split(':'):
+                    print "DEBUG regexChange: {0} {1}".format(reg, rvalue)
+                    pattern = "("+reg+")\s+(.*)"
+                    m = re.search(pattern, line)
+                    if m:
+                        print "DEBUG regex found"
+
             print "\t{0}".format(line),
         print "}"
         print ""
 
-    except:
-        print "This should not happen, but the service '{0}' does not exist, please try again".format(service)
+#    except:
+#        print "This should not happen, but the service '{0}' does not exist, please try again".format(service)
 
 ##
 ## Get hostgroup entries

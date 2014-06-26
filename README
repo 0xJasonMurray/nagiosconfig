@@ -1,131 +1,58 @@
-==================================================
-===> MUCH BETTER DOCUMENTATION IS COMING SOON <===
-==================================================
+Overview
+========
+Script to generate individual Nagios host and service configuration files for
+each device to be monitored.  Each configuration file should be written to its
+own configuration file.   Nagios should be configured to read all configuration
+within a directory(s).
 
 
-Version 0.1beta of command line script to configure Nagios host and service configuration files.   This is very beta and work in progress. 
+Philosophy
+==========
+The idea behind this system is to create individal configuration files for
+each device to be monitored.  This system is going to create independent
+service checks for EACH host.   This may DUPLICATE lots of service checks.
+
+Why do this?   The mains goals are:
+
+    * Flexability: If you need the ability tweak settings for each device.
+    * Simplicity: It makes it easy for everyone to understand.
+
+Why should you not use this system?   If you have many device that could all
+share a common set of configuration parameters, then I suggest you look into
+Nagios Object Inheritance and Template-Based Object Configuration.
 
 
-Service definitions are created based on template files.  The --service option is dynamically built based on the service definition files.
-
-The --hostgroups are dynamically built based on the standard Nagios hostgroup.cfg configuration file.
-
-
-General syntax and options:
-
-$ ./nagiosconfig.py --help
-usage: nagiosconfig.py [-h] --hostname HOSTNAME [--createhost]
-                       [--service {offcampusping,ping,ssh}] --ipaddr IPADDR
-                       [--parents PARENTS]
-                       [--hostgroups {nss,server,dns,unused,router,offcampus,charter}]
-                       [--devicetype {server,router,switch,unknown}]
-                       [--version]
-
-Script to automatically build Nagios host and service definations
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --hostname HOSTNAME   The fully qualified hostname
-  --createhost          Create host defination
-  --service {offcampusping,ping,ssh}
-                        Create service defination
-  --ipaddr IPADDR       Public IP address of the device
-  --parents PARENTS     FQDN of the object parents, this host must already
-                        exist. Multiple --parents can be used
-  --hostgroups {nss,server,dns,unused,router,offcampus,charter}
-                        Hostgroups the device should be a part of. Multiple
-                        --hostgroups can be used
-  --devicetype {server,router,switch,unknown}
-                        Type of device
-  --version             show program's version number and exit
+Example Usage
+=============
+$ ./nagiosconfig.py --hostname test1.example.com --ipaddr 1.2.3.4 --createhost \
+        --parents switch1.example.com --parents switch2.example.com \
+        --hostgroup server --hostgroup nss --hostgroup dns --device server \
+        --parents switch2.example.com --service ping --service ssh \
+        --device server --regexchange contact_groups:user@example.com
 
 
+Additional Notes
+================
+* The --service option is dynamically built based on the service definition template files.
+* The --hostgroups are dynamically built based on the standard Nagios hostgroup.cfg configuration file.
 
 
+Copyright / License
+===================
+Copyright (C) 2014  Jason E. Murray <jemurray@wustl.edu>
 
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-Example run:
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-$ ./nagiosconfig.py --hostname test1.example.com --ipaddr 1.2.3.4 \
-   --parents switch1.example.com --hostgroup server --hostgroup nss \
-   --hostgroup dns --device server --parents switch2.example.com \
-   --service ping --service ssh --createhost
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
-define host {
-    host_name                          test1.example.com
-    alias                              test1.example.com
-    address                            1.2.3.4
-    parents                            switch1.example.com, switch2.example.com
-    hostgroups                         server, nss, dns
-    notifications_enabled              1
-    event_handler_enabled              1
-    flap_detection_enabled             1
-    failure_prediction_enabled         1
-    process_perf_data                  1
-    retain_status_information          1
-    retain_nonstatus_information       1
-    check_command                      check-host-alive
-    max_check_attempts                 10
-    notification_interval              0
-    notification_period                24x7
-    notification_options               d,u,r
-    contact_groups                     admins
-    icon_image                         base/linux40.png
-    icon_image_alt                     Debian GNU/Linux
-}
-
-service {
-    service_description             PING-test1.example.com
-    host_name                       test1.example.com
-    check_command                   check_ping
-    notification_interval           0
-    active_checks_enabled           1
-    passive_checks_enabled          1
-    parallelize_check               1
-    obsess_over_service             1
-    check_freshness                 0
-    notifications_enabled           1
-    event_handler_enabled           1
-    flap_detection_enabled          1
-    failure_prediction_enabled      1
-    process_perf_data               1
-    retain_status_information       1
-    retain_nonstatus_information    1
-    is_volatile                     0
-    check_period                    24x7
-    normal_check_interval           5
-    retry_check_interval            1
-    max_check_attempts              4
-    notification_period             24x7
-    notification_options            w,u,c,r
-    contact_groups                  admins
-}
-
-service {
-    service_description             SSH-test1.example.com
-    host_name                       test1.example.com
-    check_command                   check_ssh
-    notification_interval           0
-    active_checks_enabled           1
-    passive_checks_enabled          1
-    parallelize_check               1
-    obsess_over_service             1
-    check_freshness                 0
-    notifications_enabled           1
-    event_handler_enabled           1
-    flap_detection_enabled          1
-    failure_prediction_enabled      1
-    process_perf_data               1
-    retain_status_information       1
-    retain_nonstatus_information    1
-    is_volatile                     0
-    check_period                    24x7
-    normal_check_interval           5
-    retry_check_interval            1
-    max_check_attempts              4
-    notification_period             24x7
-    notification_options            w,u,c,r
-    contact_groups                  admins
 
 

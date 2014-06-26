@@ -1,10 +1,9 @@
 Overview
 ========
-Script to generate individual Nagios host and service configuration files for
-each device to be monitored.  Each configuration file should be written to its
-own configuration file.   Nagios should be configured to read all configuration
-within a directory(s).
-
+Script used to generate Nagios host and service definitions.  A single configuration
+file with the host{} and service{} definitions should be created for each device to 
+be monitored (see example usage below).   Nagios should be configured to read all 
+configuration within a directory(s).
 
 Philosophy
 ==========
@@ -17,9 +16,10 @@ Why do this?   The mains goals are:
     * Flexability: If you need the ability tweak settings for each device.
     * Simplicity: It makes it easy for everyone to understand.
 
-Why should you not use this system?   If you have many device that could all
-share a common set of configuration parameters, then I suggest you look into
-Nagios Object Inheritance and Template-Based Object Configuration.
+DON'T use this system if... If you have many device that could all share 
+a common set of configuration parameters and you don't mind a system that 
+is more complex to initially setup.  I would suggest looking into Nagios 
+Object Inheritance and Template-Based Object Configuration.
 
 
 Example Usage
@@ -28,7 +28,7 @@ $ ./nagiosconfig.py --hostname test1.example.com --ipaddr 1.2.3.4 --createhost \
         --parents switch1.example.com --parents switch2.example.com \
         --hostgroup server --hostgroup nss --hostgroup dns --device server \
         --parents switch2.example.com --service ping --service ssh \
-        --device server --regexchange contact_groups:user@example.com
+        --device server --regexchange contact_groups:user@example.com > test1.cfg
 
 
 Additional Notes

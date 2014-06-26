@@ -3,7 +3,7 @@ Overview
 Script used to generate Nagios host and service definitions.  A single configuration
 file with the host{} and service{} definitions should be created for each device to 
 be monitored (see example usage below).   Nagios should be configured to read all 
-configuration within a directory(s).
+configuration files within a directory(s).
 
 Philosophy
 ==========

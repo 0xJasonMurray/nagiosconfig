@@ -1,8 +1,8 @@
-#type: ping
+#type: pingoffcampus
 
 service_description             %%service_description%%
 host_name                       %%host_name%%
-check_command                   check_ping
+check_command                   check_ping!500.0,30%!1000.0,40%
 notification_interval           0
 active_checks_enabled           1
 passive_checks_enabled          1

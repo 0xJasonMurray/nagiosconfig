@@ -57,9 +57,10 @@ import logging
 
 
 # Template file locations 
-hostTemplates = 'templates/host'
-serviceTemplates = 'templates/service'
-hostGroupFile = './hostgroups.cfg'
+baseDir = '.'
+hostTemplates = baseDir+'/templates/host'
+serviceTemplates = baseDir+'/templates/service'
+hostGroupFile = baseDir+'/hostgroups.cfg'
 
 # Available device types.   These are used to determin the host images/icons
 availableDeviceTypes = ['server', 'router', 'switch', 'unknown']
@@ -231,7 +232,7 @@ def getHostGroups(hostGroupFile):
 
     availableHostGroups = []
     fh = open(hostGroupFile, 'r')
-    pattern = '^\s+hostgroup_name\s+(\w+)$'
+    pattern = '^\s+hostgroup_name\s+(.*)$'
     recomp = re.compile(pattern)
     for line in fh:
         result = recomp.match(line)

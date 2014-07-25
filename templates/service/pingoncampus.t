@@ -1,8 +1,8 @@
-#type: offcampusping
+#type: pingoncampus
 
 service_description             %%service_description%%
 host_name                       %%host_name%%
-check_command                   check_icmp
+check_command                   check_ping!50.0,10%!100.0,20%
 notification_interval           0
 active_checks_enabled           1
 passive_checks_enabled          1

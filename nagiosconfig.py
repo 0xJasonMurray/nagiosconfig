@@ -13,7 +13,7 @@ Philosophy
 ==========
 The idea behind this system is to create individal configuration files for
 each device to be monitored.  This system is going to create independent
-service checks for EACH host.   This may DUPLICATE lots of service checks.  
+service checks for EACH host.   This may DUPLICATE lots of service checks.
 
 Why do this?   The mains goals are:
 
@@ -22,7 +22,7 @@ Why do this?   The mains goals are:
 
 Why should you not use this system?   If you have many device that could all
 share a common set of configuration parameters, then I suggest you look into
-Nagios Object Inheritance and Template-Based Object Configuration.  
+Nagios Object Inheritance and Template-Based Object Configuration.
 
 Example Usage
 =============
@@ -56,7 +56,7 @@ import glob
 import logging
 
 
-# Template file locations 
+# Template file locations
 baseDir = '.'
 hostTemplates = baseDir+'/templates/host'
 serviceTemplates = baseDir+'/templates/service'
@@ -119,10 +119,10 @@ def validateArgs(args):
 
 def buildHost(args):
     """
-    Build the host defination.   
-    
-    TODO: I think this will get changed over to using templates.  
-          For now simple print lines are used in order to skip key:values 
+    Build the host defination.
+
+    TODO: I think this will get changed over to using templates.
+          For now simple print lines are used in order to skip key:values
           that are not used
 
     :params args: list of arguments
@@ -210,7 +210,7 @@ def buildService(service, serviceCheckFiles, args):
                 # break the loop if a regex match is found
                 if found:
                      continue
-            
+
             # Nothing matched above, print the line from the template.
             print "\t{0}".format(line),
 
@@ -289,5 +289,4 @@ if __name__ == '__main__':
     """
     Make sure script is called directly
     """
-
     main()
